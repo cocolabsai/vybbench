@@ -12,7 +12,7 @@ import os
 from ..model import Model, Start
 from ._sizing import dimensions
 
-DEFAULT_MODEL = "gpt-image-2.5-sunburst"  # the id the published card names; TODO: confirm the OpenAI API accepts it
+DEFAULT_MODEL = "gpt-image-2.5-sunburst"
 QUALITY = "high"  # a benchmark reports a model's best attempt
 
 
