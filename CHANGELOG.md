@@ -17,4 +17,4 @@ and data revision into the results JSON itself.
 - Judge model: `gemini-3.5-flash` (recorded in all 2,400 verdicts), temperature 0.
 - Judge prompt: `prompts/judge.txt`, sha256
   `30b68b6812ce17a8901107d81d19481812a844bada8cf39bf40ebe3f841f4f97`.
-- Data revision: set when the dataset is re-uploaded in its final layout.
+- Data revision: `2907a6860693f811f98bea13e9b6cca55d226151`.

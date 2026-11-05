@@ -24,7 +24,7 @@ REPO_ID = "cocolabs/vybbench"
 # The HF commit this release of the code reproduces. Set once per release,
 # after the upload that creates that commit, so later uploads cannot change
 # what a release computes. ``None`` follows the dataset's latest revision.
-REVISION: str | None = None
+REVISION: str | None = "2907a6860693f811f98bea13e9b6cca55d226151"
 
 _LOCAL = Path(__file__).resolve().parents[2] / "hf"
 
