@@ -19,7 +19,7 @@ from ..model import Model, Start
 from ._sizing import dimensions
 
 BASE_URL = "https://external.api.recraft.ai/v1/images"
-DEFAULT_MODEL = "recraftv4_1"  # TODO: confirm the id and that it matches v4.1
+DEFAULT_MODEL = "recraftv4_1"
 EDIT_STRENGTH = 0.5
 PROMPT_MAX_CHARS = 1000
 
