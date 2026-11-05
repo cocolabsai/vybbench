@@ -46,3 +46,15 @@ def test_revision_is_local_inside_the_repo():
 def test_v1_0_results_have_no_provenance_block():
     results = json.loads((data.root() / "results" / "v1.0.json").read_text())
     assert set(results) == {"fonts", "colors", "edits"}
+
+
+def test_download_prefix_filter():
+    assert data._prefixes(("data/*", "starts/**")) == ("data/", "starts/")
+    assert data._prefixes(()) == ("",)
+
+
+def test_fetch_skips_complete_files(tmp_path):
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "f.jsonl").write_bytes(b"abc")
+    # client=None proves no network touch when the file is already complete
+    assert data._fetch(None, "rev", tmp_path, ("data/f.jsonl", 3)) is False

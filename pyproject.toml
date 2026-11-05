@@ -13,10 +13,9 @@ dependencies = [
     "numpy",
     "pillow",
     "scikit-image",
-    "huggingface_hub",
     "google-genai",  # the edit judge
     "openai",        # built-in gpt adapter
-    "httpx",         # built-in recraft adapter
+    "httpx",         # the dataset downloader and the recraft adapter
 ]
 
 [project.optional-dependencies]
