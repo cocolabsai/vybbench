@@ -100,13 +100,26 @@ def _headers() -> dict:
     return {"authorization": f"Bearer {token}"} if token else {}
 
 
+def _get_throttled(client: httpx.Client, url: str) -> httpx.Response:
+    """GET honoring Retry-After on 429."""
+    while True:
+        response = client.get(url)
+        if response.status_code != 429:
+            response.raise_for_status()
+            return response
+        wait = float(response.headers.get("retry-after", 60))
+        logger.info("rate limited (%s); waiting %.0fs",
+                    response.headers.get("ratelimit-policy", "no policy header"),
+                    wait)
+        time.sleep(wait)
+
+
 def _tree(client: httpx.Client, rev: str) -> list[tuple[str, int]]:
     """Every (path, size) in the dataset at ``rev``, via the paginated tree API."""
     files = []
     url = f"{HUB}/api/datasets/{REPO_ID}/tree/{rev}?recursive=true"
     while url:
-        response = client.get(url)
-        response.raise_for_status()
+        response = _get_throttled(client, url)
         files += [(e["path"], e["size"]) for e in response.json()
                   if e["type"] == "file"]
         url = response.links.get("next", {}).get("url")

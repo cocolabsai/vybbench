@@ -43,10 +43,14 @@ def slug(case_id: str) -> str:
     return case_id.replace("/", "_").replace("#", "").lower()
 
 
-def _attempt_paths(arm: str, subtest: str, case_id: str) -> list[Path]:
+def _attempt_paths(arm: str, subtest: str, case_id: str,
+                   published_root: Path | None = None) -> list[Path]:
     """This machine's own run of ``arm`` (``data.out_dir()``) wins over the
-    published one, so a model you ran is scored from your outputs."""
-    for base in (data.out_dir() / "outputs", outputs_dir()):
+    published one, so a model you ran is scored from your outputs.
+    ``published_root`` lets worker processes reuse the root the parent already
+    resolved instead of re-triggering the download."""
+    published = (published_root or root()) / "outputs"
+    for base in (data.out_dir() / "outputs", published):
         directory = base / arm / subtest / slug(case_id)
         if directory.is_dir():
             return sorted(directory.glob("a*.png"))
@@ -72,16 +76,19 @@ def _percentiles(values: list[float], points: tuple[int, ...]) -> dict:
     return out
 
 
-def _font_case_ious(case, arms: tuple[str, ...]) -> dict:
+def _font_case_ious(case, arms: tuple[str, ...], root_dir: Path) -> dict:
     """One case's per-arm attempt IoUs; alignment search is CPU-heavy, so
-    score_fonts fans cases out over processes."""
-    reference = Image.open(root() / "references" / f"{slug(case.case_id)}.png")
+    score_fonts fans cases out over processes. ``root_dir`` is resolved by the
+    parent: workers must never resolve it themselves, or each would race to
+    download the dataset."""
+    reference = Image.open(root_dir / "references" / f"{slug(case.case_id)}.png")
     components = fonts.max_ink_components(case.word)
     out = {}
     for arm in arms:
         ious = [
             1.0 - result.mismatch_fraction
-            for path in _attempt_paths(arm, "fonts", case.case_id)
+            for path in _attempt_paths(arm, "fonts", case.case_id,
+                                       published_root=root_dir)
             if (result := fonts.font_mismatch(
                 reference, Image.open(path), components)).valid
         ]
@@ -93,9 +100,11 @@ def _font_case_ious(case, arms: tuple[str, ...]) -> dict:
 def score_fonts(arms: tuple[str, ...] = ARMS) -> dict:
     """Per-arm IoU distribution over every scored attempt, plus the recorded
     measurement noise floor over the same word set."""
+    root_dir = root()  # resolve (and download) once, before the pool forks
     cases = font_cases()
     with ProcessPoolExecutor() as pool:
-        case_scores = list(pool.map(partial(_font_case_ious, arms=arms), cases))
+        case_scores = list(pool.map(
+            partial(_font_case_ious, arms=arms, root_dir=root_dir), cases))
     per_arm = {
         arm: [iou for scores in case_scores for iou in scores.get(arm, [])]
         for arm in arms

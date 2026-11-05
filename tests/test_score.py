@@ -58,3 +58,17 @@ def test_fetch_skips_complete_files(tmp_path):
     (tmp_path / "data" / "f.jsonl").write_bytes(b"abc")
     # client=None proves no network touch when the file is already complete
     assert data._fetch(None, "rev", tmp_path, ("data/f.jsonl", 3)) is False
+
+
+def _forbidden_root(*patterns):
+    raise AssertionError("worker resolved the dataset root itself")
+
+
+def test_font_worker_never_resolves_root(tmp_path, monkeypatch):
+    from vybbench.cases import font_cases
+
+    monkeypatch.setenv("VYBBENCH_OUT", str(tmp_path))
+    case = font_cases()[0]  # loads via the real root, before the patch
+    monkeypatch.setattr(data, "root", _forbidden_root)
+    monkeypatch.setattr(score, "root", _forbidden_root)
+    assert score._font_case_ious(case, ("nobody",), root_dir=data._LOCAL) == {}
