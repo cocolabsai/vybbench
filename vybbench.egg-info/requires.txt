@@ -1,0 +1,10 @@
+numpy
+pillow
+scikit-image
+huggingface_hub
+google-genai
+openai
+httpx
+
+[test]
+pytest

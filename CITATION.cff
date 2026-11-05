@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use VybBench, please cite it as below."
+title: "VybBench 1.0: A Design Fidelity Benchmark"
+authors:
+  - name: "Coco Labs"
+date-released: 2026-10-20
+version: "1.0"
+url: "https://github.com/cocolabsai/vybbench"
+repository-code: "https://github.com/cocolabsai/vybbench"

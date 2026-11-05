@@ -1,0 +1,2 @@
+[console_scripts]
+vybbench = vybbench.cli:main

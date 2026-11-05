@@ -1,0 +1,87 @@
+Metadata-Version: 2.4
+Name: vybbench
+Version: 1.0.0
+Summary: VybBench: a design-fidelity benchmark (fonts, colors, edits)
+License: Apache-2.0
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: pillow
+Requires-Dist: scikit-image
+Requires-Dist: huggingface_hub
+Requires-Dist: google-genai
+Requires-Dist: openai
+Requires-Dist: httpx
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Dynamic: license-file
+
+# VybBench
+
+**Almost isn't good enough.** VybBench measures how well models maintain
+design fidelity by comparing how effectively they generate specific
+fonts and colors, and perform non-destructive edits.
+
+Our dataset consists of 145 fonts, 100 colors, and 200 edits. We have each model
+perform each task three times and score each generation individually.
+
+We compare top image generation models:
+ChatGPT Image (gpt-image-2.5-sunburst), Meta Muse, and Recraft v4.1. We also report
+the results for [Vyb 1.0](https://cocolabs.ai/vyb).
+
+Full Disclosure: VybBench was built by Coco Labs, the makers of Vyb. The full
+methodology and rationale are in
+[the launch post](https://cocolabs.ai/blog/introducing-vybbench).
+
+<!-- TODO: one line — this repo is the code; the data and results are the HF dataset (https://huggingface.co/datasets/cocolabs/vybbench), downloaded automatically. -->
+
+## Results
+
+<!-- TODO: one combined results table (fonts / colors / edits), assembled from the dataset card's three tables. Full methodology and figures stay on the card. -->
+
+## Disclosure
+
+<!-- TODO: short bullets — judge (gemini-3.5-flash, temp 0), 3 attempts all scored, Vyb's 1:1 aspect hint, Vyb edits SVG / others PNG, ChatGPT via Azure, Recraft edits via V3. -->
+
+## Reproduce
+
+```
+pip install -e .
+vybbench score
+```
+
+<!-- TODO: one line — recomputes every published number offline, no keys. -->
+
+## Add your model
+
+We are happy to include your model.
+
+```python
+from vybbench.model import Model, Start
+
+class MyModel(Model):
+    name = "mymodel"
+
+    def generate(self, prompt: str, width: int, height: int) -> bytes: ...
+    def edit(self, instruction: str, start: Start) -> bytes: ...
+```
+
+```
+vybbench run --model mypkg.mymodel:MyModel   # your model's keys
+vybbench judge                               # GEMINI_API_KEY
+vybbench score                               # no keys
+```
+
+<!-- TODO: two or three lines — both methods return PNG bytes (rasterizing is the model's job); Start carries png and svg, use either; then open an issue with the submit-model template linking your outputs. -->
+
+## Citation
+
+```bibtex
+@misc{vybbench2026,
+  title = {VybBench 1.0: A Design Fidelity Benchmark},
+  author = {{Coco Labs}},
+  year = {2026},
+  url = {https://huggingface.co/datasets/cocolabs/vybbench}
+}
+```

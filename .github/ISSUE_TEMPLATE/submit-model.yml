@@ -1,0 +1,39 @@
+name: Submit a model
+description: Ask for your model to be added to the results table
+title: "Submit model: <name>"
+labels: ["submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Run the benchmark yourself (`vybbench run --model ...`), upload your
+        `outputs/<model>/` folder (3 attempts per case, the layout the runner
+        writes), and link it below. We re-judge with the pinned judge,
+        re-score, and add the model to the table in the next release.
+        Self-reported numbers are not added to the table.
+  - type: input
+    id: model
+    attributes:
+      label: Model name and version
+    validations: {required: true}
+  - type: input
+    id: outputs
+    attributes:
+      label: Link to your outputs
+      description: A Hugging Face dataset/repo or other public archive of outputs/<model>/
+    validations: {required: true}
+  - type: textarea
+    id: details
+    attributes:
+      label: How the model was run
+      description: API or weights, settings, prompt changes (e.g. an aspect hint), anything a skeptical reader would want to know.
+    validations: {required: true}
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirm
+      options:
+        - label: Three attempts per case, none cherry-picked
+          required: true
+        - label: The adapter and any prompt changes are described above
+          required: true
