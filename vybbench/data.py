@@ -60,6 +60,9 @@ def root(*patterns: str) -> Path:
         repo_type="dataset",
         revision=REVISION,
         allow_patterns=list(patterns) or None,
+        # The hub meters requests, not bytes; parallel workers burn the whole
+        # rate-limit window in seconds and then stall on 429 backoffs.
+        max_workers=1,
     ))
 
 
